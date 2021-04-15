@@ -3040,6 +3040,26 @@ MD_OutputTree_C_String(FILE *file, MD_Node *node)
     fprintf(file, "\"");
 }
 
+#define MD_UnionTag MD_S8Lit("union")
+MD_PRIVATE_FUNCTION_IMPL void
+MD_OutputTree_C_StructContents(FILE *file, MD_Node *node)
+{
+    for(MD_EachNode(child, node->first_child))
+    {
+        if(MD_NodeHasTag(child, MD_UnionTag))
+        {
+            fprintf(file, "union\n{\n");
+            MD_OutputTree_C_StructContents(file, child);
+            fprintf(file, "} %.*s;\n", MD_StringExpand(child->string));
+        }
+        else
+        {
+            MD_OutputTree_C_Decl(file, child);
+            fprintf(file, ";\n");
+        }
+    }
+}
+
 MD_FUNCTION_IMPL void
 MD_OutputTree_C_Struct(FILE *file, MD_Node *node)
 {
@@ -3049,11 +3069,7 @@ MD_OutputTree_C_Struct(FILE *file, MD_Node *node)
                 MD_StringExpand(node->string),
                 MD_StringExpand(node->string));
         fprintf(file, "struct %.*s\n{\n", MD_StringExpand(node->string));
-        for(MD_Node *child = node->first_child; !MD_NodeIsNil(child); child = child->next)
-        {
-            MD_OutputTree_C_Decl(file, child);
-            fprintf(file, ";\n");
-        }
+        MD_OutputTree_C_StructContents(file, node);
         fprintf(file, "};\n\n");
     }
 }

@@ -15,6 +15,10 @@ int main(int argument_count, char **arguments)
                                        "  e: *[100]F32,\n"
                                        "  f: ([4 + 5]S32),\n"
                                        "  g: ([FOO + BAR]I32),\n"
+                                       "  @union g: {\n"
+                                           "ua: S32,\n"
+                                           "ub: F32,\n"
+                                          "},\n" 
                                        "}\n\n");
     MD_Node *code = MD_ParseWholeString(MD_S8Lit("Generated Test Code"), example_code).node;
     
